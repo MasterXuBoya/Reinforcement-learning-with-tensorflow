@@ -9,7 +9,27 @@ Using:
 Tensorflow: 1.0
 gym: 0.8.0
 """
-
+'''
+@Author MasterXu 
+@Modify Time:2018/6/16
+Observation，Action，Reward
+1.gym can be only installed in linux and mac system,not for window now
+2.程序从gym获取observation，负责决策action，然后将action传递给gym环境；
+  类似从控制系统中获得速度、加速度等信号，然后进行控制算法，输出到控制系统中
+  
+  gym是一个环境，返回action后重新获得observation；类似于在模拟控制系统，CartPole内部应该有倒立摆的数学模型
+    observation_, reward, done, info = env.step(action)
+3.在CartPole倒立摆系统中，Observation是4维向量，表示位置，速度，杆的角度，角速度等
+  Action存在两个状态0和1，表示向左和向后
+  Reward：当倒立摆位于中心位置15°返回1，否则为0
+4.神经网络输入是4维，隐层10维，输出是2维，对应Action
+  _discount_and_norm_rewards专门计算某一个Action的长远奖励vt
+  损失函数是vt*交叉熵（神经网络输出，此状态的Action）
+  neg_log_prob = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=all_act, labels=self.tf_acts)   # this is negative log of chosen action
+  loss = tf.reduce_mean(neg_log_prob * self.tf_vt)  # reward guided loss
+  输出就是每一个Action对应的概率，最后按照对应概率输出
+  如果Action是连续的，那么输出就是Action
+'''
 import gym
 from RL_brain import PolicyGradient
 import matplotlib.pyplot as plt
